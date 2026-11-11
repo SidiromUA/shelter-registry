@@ -1,0 +1,23 @@
+# Maven / Gradle
+target/
+build/
+.gradle/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs and local config
+*.log
+logs/
+db.properties
+.env
+
+# Tomcat (локальна інсталяція для ЛР4)
+tools/

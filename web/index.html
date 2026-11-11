@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Реєстр укриттів міста: адреси, місткість, стан готовності та доступність для маломобільних груп населення.">
+  <title>Реєстр укриттів міста</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Перейти до основного вмісту</a>
+
+  <header class="site-header">
+    <p class="logo">Реєстр укриттів</p>
+    <nav aria-label="Основна навігація">
+      <ul>
+        <li><a href="index.html" aria-current="page">Укриття</a></li>
+        <li><a href="#districts">Райони</a></li>
+        <li><a href="#about">Про проєкт</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+    <h1>Укриття міста</h1>
+    <p>Перелік захисних споруд і найпростіших укриттів із зазначенням місткості та стану готовності.
+       Дані навчальні та не відповідають реальним об’єктам.</p>
+
+    <section aria-labelledby="list-title">
+      <h2 id="list-title">Перелік укриттів</h2>
+      <table>
+        <caption>Укриття, зареєстровані в системі (станом на 01.02.2027)</caption>
+        <thead>
+          <tr>
+            <th scope="col">Назва</th>
+            <th scope="col">Адреса</th>
+            <th scope="col">Район</th>
+            <th scope="col">Тип</th>
+            <th scope="col">Місткість, осіб</th>
+            <th scope="col">Доступність</th>
+            <th scope="col">Стан</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Укриття № 1</td>
+            <td>вул. Клепарівська, 35</td>
+            <td>Шевченківський</td>
+            <td>Підвал</td>
+            <td>120</td>
+            <td>Пандус</td>
+            <td><span class="status status-ready">Готове</span></td>
+          </tr>
+          <tr>
+            <td>Підземний паркінг ТЦ</td>
+            <td>вул. Городоцька, 120</td>
+            <td>Залізничний</td>
+            <td>Паркінг</td>
+            <td>450</td>
+            <td>Ліфт</td>
+            <td><span class="status status-ready">Готове</span></td>
+          </tr>
+          <tr>
+            <td>Школа № 12</td>
+            <td>вул. Наукова, 7</td>
+            <td>Франківський</td>
+            <td>Захисна споруда ЦЗ</td>
+            <td>300</td>
+            <td>Немає</td>
+            <td><span class="status status-limited">Обмежено готове</span></td>
+          </tr>
+          <tr>
+            <td>Укриття № 4</td>
+            <td>просп. Червоної Калини, 60</td>
+            <td>Сихівський</td>
+            <td>Підвал</td>
+            <td>80</td>
+            <td>Немає</td>
+            <td><span class="status status-not-ready">Не готове</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="districts" aria-labelledby="districts-title">
+      <h2 id="districts-title">Райони</h2>
+      <ul>
+        <li>Галицький</li>
+        <li>Залізничний</li>
+        <li>Личаківський</li>
+        <li>Сихівський</li>
+        <li>Франківський</li>
+        <li>Шевченківський</li>
+      </ul>
+    </section>
+
+    <section id="about" aria-labelledby="about-title">
+      <h2 id="about-title">Про проєкт</h2>
+      <p>Навчальний вебзастосунок дисципліни «WEB-технології та WEB-програмування» (ЛДУ БЖД).
+         Протягом семестру ця статична сторінка перетвориться на вебсервіс на Java та Spring Boot
+         з базою даних, REST API, автентифікацією та тестами.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2027 Кафедра ІТтаСЕК, ЛДУ БЖД. Навчальний проєкт.</p>
+  </footer>
+</body>
+</html>
