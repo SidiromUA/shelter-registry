@@ -12,7 +12,7 @@
 | `lab-02` | БД і JDBC | SQL-схема, DAO на JDBC, транзакції |
 | `lab-03` | MVC і доступність | шари model / repository / service, WCAG |
 | `lab-04` | Servlet API, Tomcat | сервлети, JSP, сесії, фільтр авторизації |
-| `lab-05` | Spring Boot | біни, впровадження залежностей, перший REST-контролер |
+| `lab-05` | Spring Boot | біни, впровадження залежностей, JdbcClient, перший REST-контролер |
 | `lab-06` | Конфігурація | профілі, `application.yml`, логування, Docker |
 | `lab-07` | Вебсторінки і REST API | Thymeleaf, CRUD API, валідація, Swagger |
 | `lab-08` | JPA, безпека, тести | Spring Data JPA, Flyway, Spring Security, JUnit |
@@ -99,3 +99,28 @@ $CATALINA_HOME/bin/startup.sh          # http://localhost:8080/shelters/shelters
 ```
 
 Облікові записи: `admin` / `admin` (може видаляти), `inspector` / `inspector`.
+
+### ЛР5 — Spring Boot
+
+Проєкт перенесено на **Spring Boot 4.1** (Java 21, Maven). Порівняйте з `lab-04`:
+
+| Було (ЛР3–4) | Стало (ЛР5) |
+|---|---|
+| `new ShelterService(new JdbcShelterRepository(), …)` вручну | `@Service`, `@Repository` — об’єкти створює і зв’язує Spring (IoC/DI) |
+| `DriverManager.getConnection(...)` | `DataSource` (пул HikariCP) з `application.properties` |
+| `PreparedStatement`, `ResultSet`, `try-with-resources` | `JdbcClient` |
+| `setAutoCommit(false)` / `commit()` / `rollback()` | `@Transactional` |
+| `HttpServlet.doGet` + JSP | `@RestController` + JSON |
+| WAR + окремий Tomcat | виконуваний jar з вбудованим Tomcat |
+
+```bash
+mvn spring-boot:run          # або: mvn package && java -jar target/shelter-registry-0.5.0.jar
+```
+
+| Запит | Відповідь |
+|---|---|
+| `GET /hello?name=Олена` | текст |
+| `GET /api/shelters`, `GET /api/shelters?districtId=6` | список укриттів (JSON) |
+| `GET /api/shelters/3` | одне укриття; неіснуюче — 404 |
+| `GET /api/shelters/3/inspections` | перевірки укриття |
+| `GET /api/districts` | райони |
