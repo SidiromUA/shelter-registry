@@ -34,7 +34,9 @@ git checkout lab-02
 
 > Дані навчальні та не відповідають реальним об’єктам.
 
-## Поточний етап: ЛР1
+## Запуск
+
+### ЛР1 — статична сторінка
 
 ```bash
 cd web
@@ -42,3 +44,22 @@ jwebserver -p 8000      # JDK 18+
 ```
 
 Далі — http://localhost:8000. Приклади HTTP-запитів: [docs/http-examples.md](docs/http-examples.md).
+
+### ЛР2 — база даних і JDBC
+
+Потрібні JDK 21, Maven, PostgreSQL.
+
+```bash
+# 1. Створити користувача та БД (один раз)
+psql -d postgres -c "CREATE ROLE shelter LOGIN PASSWORD 'shelter';"
+psql -d postgres -c "CREATE DATABASE shelter_registry OWNER shelter;"
+
+# 2. Схема і тестові дані
+psql -h localhost -U shelter -d shelter_registry -f db/schema.sql -f db/data.sql
+
+# 3. Консольний застосунок
+mvn compile exec:java
+```
+
+Параметри підключення можна змінити змінними оточення `DB_URL`, `DB_USER`, `DB_PASSWORD`.
+Приклади SQL-запитів — [db/queries.sql](db/queries.sql).
