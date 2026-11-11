@@ -1,6 +1,9 @@
 package ua.edu.ldubgd.shelters.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import ua.edu.ldubgd.shelters.config.RegistryProperties;
 import org.springframework.transaction.annotation.Transactional;
 import ua.edu.ldubgd.shelters.dto.CreateShelterRequest;
 import ua.edu.ldubgd.shelters.dto.ShelterView;
@@ -27,17 +30,33 @@ import java.util.List;
 @Service
 public class ShelterService {
 
+    private static final Logger log = LoggerFactory.getLogger(ShelterService.class);
+
     private final ShelterRepository shelters;
     private final DistrictRepository districts;
     private final InspectionRepository inspections;
     private final Clock clock;
+    private final RegistryProperties properties;
 
     public ShelterService(ShelterRepository shelters, DistrictRepository districts,
-                          InspectionRepository inspections, Clock clock) {
+                          InspectionRepository inspections, Clock clock, RegistryProperties properties) {
         this.shelters = shelters;
         this.districts = districts;
         this.inspections = inspections;
         this.clock = clock;
+        this.properties = properties;
+    }
+
+    /**
+     * Укриття, які давно не перевірялися (інтервал задано в application.yml → registry.inspection-interval-days).
+     */
+    public List<ShelterView> findOverdueInspection() {
+        LocalDate border = LocalDate.now(clock).minusDays(properties.inspectionIntervalDays());
+        log.debug("Пошук укриттів без перевірки після {}", border);
+        return shelters.findAll().stream()
+                .filter(s -> s.getLastInspectionDate() == null || s.getLastInspectionDate().isBefore(border))
+                .map(ShelterView::from)
+                .toList();
     }
 
     public List<ShelterView> findAll() {
@@ -81,17 +100,21 @@ public class ShelterService {
             errors.add("Оберіть район зі списку");
         }
         if (!errors.isEmpty()) {
+            log.warn("Відхилено створення укриття: {}", errors);
             throw new ValidationException(errors);
         }
         Shelter shelter = new Shelter(request.name().trim(), request.address().trim(), district,
                 type, request.capacity(), request.accessible());
-        return ShelterView.from(shelters.save(shelter));
+        Shelter saved = shelters.save(shelter);
+        log.info("Створено укриття id={} «{}»", saved.getId(), saved.getName());
+        return ShelterView.from(saved);
     }
 
     public void delete(int id) {
         if (!shelters.deleteById(id)) {
             throw new NotFoundException("Укриття з id=" + id + " не знайдено");
         }
+        log.info("Видалено укриття id={}", id);
     }
 
     /**

@@ -1,0 +1,37 @@
+# ЛР6. Конфігурація застосунку.
+# Спільні налаштування — у цьому файлі; відмінності середовищ — у application-<профіль>.yml.
+# Профіль обирається: spring.profiles.active, змінна оточення SPRING_PROFILES_ACTIVE
+# або аргумент: java -jar app.jar --spring.profiles.active=prod
+
+spring:
+  application:
+    name: shelter-registry
+  profiles:
+    active: dev                      # за замовчуванням — розроблення
+
+server:
+  port: ${PORT:8080}                 # значення зі змінної оточення PORT, інакше 8080
+
+# Власні налаштування застосунку → клас RegistryProperties (@ConfigurationProperties)
+registry:
+  city: Львів
+  inspection-interval-days: 90       # як часто укриття має проходити перевірку
+  contact-email: cz@example.com
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Реєстр укриттів
+    version: '@project.version@'     # підставляє Maven під час збирання
+
+logging:
+  level:
+    root: INFO

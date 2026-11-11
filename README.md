@@ -54,8 +54,8 @@ jwebserver -p 8000      # JDK 18+
 psql -d postgres -c "CREATE ROLE shelter LOGIN PASSWORD 'shelter';"
 psql -d postgres -c "CREATE DATABASE shelter_registry OWNER shelter;"
 
-# 2. Схема і тестові дані
-psql -h localhost -U shelter -d shelter_registry -f db/schema.sql -f db/data.sql
+# 2. Схема і тестові дані (з ЛР6 файли лежать у src/main/resources/db/)
+psql -h localhost -U shelter -d shelter_registry -f src/main/resources/db/schema.sql -f src/main/resources/db/data.sql
 
 # 3. Консольний застосунок
 mvn compile exec:java
@@ -124,3 +124,25 @@ mvn spring-boot:run          # або: mvn package && java -jar target/shelter-r
 | `GET /api/shelters/3` | одне укриття; неіснуюче — 404 |
 | `GET /api/shelters/3/inspections` | перевірки укриття |
 | `GET /api/districts` | райони |
+
+### ЛР6 — конфігурація, профілі, збирання, Docker
+
+| Файл | Призначення |
+|---|---|
+| `application.yml` | спільні налаштування, власний блок `registry:`, Actuator |
+| `application-dev.yml` | H2 у пам’яті, схема і дані при кожному запуску, H2-консоль, журнал SQL |
+| `application-prod.yml` | PostgreSQL зі змінних оточення `DB_URL`, `DB_USER`, `DB_PASSWORD`, журнал у файл |
+| `RegistryProperties` | типізовані налаштування `@ConfigurationProperties` з перевіркою значень |
+
+```bash
+mvn spring-boot:run                                   # профіль dev — БД не потрібна
+# http://localhost:8080/h2-console  (JDBC URL: jdbc:h2:mem:shelters, користувач sa, без пароля)
+
+mvn package
+SPRING_PROFILES_ACTIVE=prod java -jar target/shelter-registry-0.6.0.jar     # PostgreSQL
+java -jar target/shelter-registry-0.6.0.jar --registry.inspection-interval-days=30 --server.port=9090
+
+docker compose up --build                             # застосунок + PostgreSQL у контейнерах
+```
+
+Нові ендпоінти: `GET /api/shelters/overdue` (прострочені перевірки), `GET /actuator/health`, `GET /actuator/info`.

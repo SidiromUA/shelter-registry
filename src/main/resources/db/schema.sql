@@ -1,5 +1,5 @@
 -- ЛР2. Схема бази даних «Реєстр укриттів» (PostgreSQL)
--- Запуск: psql -U shelter -d shelter_registry -f db/schema.sql
+-- Запуск: psql -h localhost -U shelter -d shelter_registry -f src/main/resources/db/schema.sql
 
 DROP TABLE IF EXISTS inspections;
 DROP TABLE IF EXISTS shelters;

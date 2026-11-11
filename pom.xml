@@ -14,7 +14,7 @@
 
     <groupId>ua.edu.ldubgd</groupId>
     <artifactId>shelter-registry</artifactId>
-    <version>0.5.0</version>
+    <version>0.6.0</version>
     <name>Реєстр укриттів</name>
 
     <properties>
@@ -36,6 +36,27 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
+        </dependency>
+
+        <!-- ЛР6: БД H2 у пам’яті для профілю dev і її вебконсоль -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-h2console</artifactId>
+        </dependency>
+        <!-- ЛР6: перевірка значень @ConfigurationProperties (Bean Validation) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <!-- ЛР6: службові ендпоінти /actuator/health, /actuator/info -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
         <dependency>

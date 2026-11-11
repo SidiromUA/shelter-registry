@@ -1,0 +1,19 @@
+# Профіль prod — промислова експлуатація: PostgreSQL, параметри — зі змінних оточення.
+# Паролі не зберігаються в репозиторії!
+
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/shelter_registry}
+    username: ${DB_USER:shelter}
+    password: ${DB_PASSWORD:shelter}
+    hikari:
+      maximum-pool-size: 10
+  sql:
+    init:
+      mode: never                    # схему створює адміністратор БД (з ЛР8 — Flyway)
+
+logging:
+  level:
+    ua.edu.ldubgd.shelters: INFO
+  file:
+    name: logs/shelter-registry.log  # журнал у файл (ротація — автоматично)

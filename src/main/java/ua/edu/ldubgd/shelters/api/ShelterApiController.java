@@ -37,6 +37,12 @@ public class ShelterApiController {
         return districtId == null ? service.findAll() : service.findByDistrict(districtId);
     }
 
+    /** GET /api/shelters/overdue — укриття з простроченою перевіркою (ЛР6) */
+    @GetMapping("/shelters/overdue")
+    public List<ShelterView> overdue() {
+        return service.findOverdueInspection();
+    }
+
     /** GET /api/shelters/3 */
     @GetMapping("/shelters/{id}")
     public ShelterView shelter(@PathVariable int id) {
