@@ -54,8 +54,10 @@ jwebserver -p 8000      # JDK 18+
 psql -d postgres -c "CREATE ROLE shelter LOGIN PASSWORD 'shelter';"
 psql -d postgres -c "CREATE DATABASE shelter_registry OWNER shelter;"
 
-# 2. Схема і тестові дані (з ЛР6 файли лежать у src/main/resources/db/)
-psql -h localhost -U shelter -d shelter_registry -f src/main/resources/db/schema.sql -f src/main/resources/db/data.sql
+# 2. Схема і тестові дані (на етапі lab-02: db/schema.sql і db/data.sql;
+#    з ЛР8 це міграції src/main/resources/db/migration/V1__schema.sql, V2__data.sql)
+git checkout lab-02
+psql -h localhost -U shelter -d shelter_registry -f db/schema.sql -f db/data.sql
 
 # 3. Консольний застосунок
 mvn compile exec:java
