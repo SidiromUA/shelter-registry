@@ -1,0 +1,98 @@
+/* Реєстр укриттів — базові стилі (ЛР1) */
+:root {
+  --green-dark: #1b3a2b;
+  --green: #2e7d32;
+  --text: #1f2933;
+  --muted: #52606d;
+  --border: #cbd2d9;
+  --bg: #ffffff;
+  --ready: #1e6b35;
+  --limited: #8a5a00;
+  --not-ready: #a61b1b;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  padding: 0.5rem 1rem;
+  background: var(--green-dark);
+  color: #fff;
+}
+.skip-link:focus { left: 0; }
+
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  background: var(--green-dark);
+  color: #fff;
+}
+.logo { margin: 0; font-weight: 700; font-size: 1.25rem; }
+.site-header ul { display: flex; gap: 1.25rem; margin: 0; padding: 0; list-style: none; }
+.site-header a { color: #fff; }
+.site-header a[aria-current="page"] { font-weight: 700; text-decoration-thickness: 3px; }
+
+main { max-width: 1100px; margin: 0 auto; padding: 1.5rem 2rem 3rem; }
+
+a:focus-visible,
+button:focus-visible { outline: 3px solid #f2b33d; outline-offset: 2px; }
+
+table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+caption { text-align: left; color: var(--muted); padding-bottom: 0.5rem; }
+th, td { padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border); text-align: left; }
+th { background: #f4f7f5; }
+
+.status { font-weight: 600; }
+.status-ready { color: var(--ready); }
+.status-limited { color: var(--limited); }
+.status-not-ready { color: var(--not-ready); }
+
+.site-footer { padding: 1rem 2rem; border-top: 1px solid var(--border); color: var(--muted); }
+
+@media (max-width: 720px) {
+  table, thead, tbody, tr, th, td { display: block; }
+  thead { position: absolute; left: -9999px; }
+  td { border: none; padding: 0.25rem 0; }
+  tr { border-bottom: 1px solid var(--border); padding: 0.75rem 0; }
+}
+
+/* ЛР3: форми, повідомлення, приховування для екранних читачів */
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.field { margin: 0 0 1rem; border: 0; padding: 0; }
+.field > label, legend { display: block; font-weight: 600; margin-bottom: 0.25rem; }
+fieldset label { display: block; font-weight: 400; }
+input[type="text"], input[type="number"], select {
+  width: 100%; max-width: 28rem; padding: 0.5rem; font: inherit;
+  border: 1px solid #7b8794; border-radius: 4px;
+}
+.hint { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.9rem; }
+button {
+  padding: 0.6rem 1.4rem; font: inherit; font-weight: 600; color: #fff;
+  background: var(--green); border: 0; border-radius: 4px; cursor: pointer;
+}
+.message { padding: 0.75rem 1rem; background: #e8f3df; border-left: 4px solid var(--green); }
+.errors { padding: 0.75rem 1rem; background: #fdecec; border-left: 4px solid var(--not-ready); }
+.errors h2 { margin: 0 0 0.25rem; font-size: 1.1rem; }
+
+/* ЛР4: кнопки у формах-рядках */
+form.inline { display: inline; margin: 0; }
+.link-button { background: none; color: #fff; padding: 0; text-decoration: underline; font-weight: 400; }
+button.danger { background: var(--not-ready); padding: 0.3rem 0.8rem; }

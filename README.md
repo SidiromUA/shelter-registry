@@ -72,6 +72,30 @@ controller  →  service  →  repository (інтерфейс)  →  repository.
   view          model, dto, exception
 ```
 
-`mvn compile exec:java` генерує сторінки `web/shelters.html` і `web/shelters-errors.html`.
+На етапі `lab-03` команда `mvn compile exec:java` генерує сторінки `web/shelters.html` і `web/shelters-errors.html`.
 Порівняйте `web/inaccessible-example.html` з `web/index.html` і `web/add-shelter.html` —
 розбір порушень WCAG у [docs/accessibility.md](docs/accessibility.md).
+
+### ЛР4 — Servlet API та Apache Tomcat
+
+| URL | Метод | Обробник | Доступ |
+|---|---|---|---|
+| `/shelters` | GET | `ShelterServlet` → `shelters.jsp` | усі |
+| `/shelters` | POST | `ShelterServlet` (додавання, валідація, PRG) | після входу |
+| `/shelters/delete` | POST | `ShelterDeleteServlet` | лише ADMIN |
+| `/login` | GET, POST | `LoginServlet` (сесія) | усі |
+| `/logout` | POST | `LogoutServlet` | усі |
+
+`AuthFilter` перевіряє сесію, `EncodingFilter` встановлює UTF-8, `AppContextListener` створює сервіси під час запуску.
+
+```bash
+# Варіант 1: вбудований Tomcat (нічого встановлювати не потрібно)
+mvn compile exec:exec                  # http://localhost:8080/shelters
+
+# Варіант 2: окремий Apache Tomcat 10.1+
+mvn package                            # target/shelters.war
+cp target/shelters.war $CATALINA_HOME/webapps/
+$CATALINA_HOME/bin/startup.sh          # http://localhost:8080/shelters/shelters
+```
+
+Облікові записи: `admin` / `admin` (може видаляти), `inspector` / `inspector`.
