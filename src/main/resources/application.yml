@@ -11,6 +11,9 @@ spring:
 
 server:
   port: ${PORT:8080}                 # значення зі змінної оточення PORT, інакше 8080
+  servlet:
+    session:
+      tracking-modes: cookie         # ідентифікатор сесії лише в cookie, не в URL (;jsessionid=...)
 
 # Власні налаштування застосунку → клас RegistryProperties (@ConfigurationProperties)
 registry:
@@ -35,3 +38,10 @@ info:
 logging:
   level:
     root: INFO
+
+# ЛР7: документація API
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs

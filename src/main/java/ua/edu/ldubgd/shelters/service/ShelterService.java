@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ua.edu.ldubgd.shelters.config.RegistryProperties;
 import org.springframework.transaction.annotation.Transactional;
-import ua.edu.ldubgd.shelters.dto.CreateShelterRequest;
+import ua.edu.ldubgd.shelters.dto.ShelterForm;
 import ua.edu.ldubgd.shelters.dto.ShelterView;
 import ua.edu.ldubgd.shelters.exception.NotFoundException;
 import ua.edu.ldubgd.shelters.exception.ValidationException;
@@ -13,15 +13,15 @@ import ua.edu.ldubgd.shelters.model.District;
 import ua.edu.ldubgd.shelters.model.Inspection;
 import ua.edu.ldubgd.shelters.model.InspectionResult;
 import ua.edu.ldubgd.shelters.model.Shelter;
-import ua.edu.ldubgd.shelters.model.ShelterType;
 import ua.edu.ldubgd.shelters.repository.DistrictRepository;
 import ua.edu.ldubgd.shelters.repository.InspectionRepository;
 import ua.edu.ldubgd.shelters.repository.ShelterRepository;
 
 import java.time.Clock;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Бізнес-логіка. Порівняйте з ЛР3: код майже той самий, але об’єкти тепер створює Spring —
@@ -80,34 +80,49 @@ public class ShelterService {
         return inspections.findByShelterId(shelterId);
     }
 
-    public ShelterView create(CreateShelterRequest request) {
-        List<String> errors = new ArrayList<>();
-        if (request.name() == null || request.name().isBlank()) {
-            errors.add("Вкажіть назву укриття");
-        }
-        if (request.address() == null || request.address().isBlank()) {
-            errors.add("Вкажіть адресу");
-        } else if (shelters.existsByAddress(request.address().trim())) {
-            errors.add("Укриття за адресою «" + request.address().trim() + "» вже зареєстровано");
-        }
-        if (request.capacity() == null || request.capacity() <= 0) {
-            errors.add("Місткість має бути додатним числом");
-        }
-        ShelterType type = parseType(request.type(), errors);
-        District district = request.districtId() == null ? null
-                : districts.findById(request.districtId()).orElse(null);
-        if (district == null) {
-            errors.add("Оберіть район зі списку");
-        }
-        if (!errors.isEmpty()) {
-            log.warn("Відхилено створення укриття: {}", errors);
-            throw new ValidationException(errors);
-        }
-        Shelter shelter = new Shelter(request.name().trim(), request.address().trim(), district,
-                type, request.capacity(), request.accessible());
-        Shelter saved = shelters.save(shelter);
+    /** Дані укриття для форми редагування. */
+    public ShelterForm getForm(int id) {
+        return ShelterForm.from(getShelter(id));
+    }
+
+    /** Формат полів уже перевірено (@Valid), тут — лише бізнес-правила. */
+    public ShelterView create(ShelterForm form) {
+        District district = checkBusinessRules(form, null);
+        Shelter saved = shelters.save(new Shelter(form.getName().trim(), form.getAddress().trim(), district,
+                form.getType(), form.getCapacity(), form.isAccessible()));
         log.info("Створено укриття id={} «{}»", saved.getId(), saved.getName());
         return ShelterView.from(saved);
+    }
+
+    public ShelterView update(int id, ShelterForm form) {
+        Shelter shelter = getShelter(id);
+        District district = checkBusinessRules(form, id);
+        shelter.setName(form.getName().trim());
+        shelter.setAddress(form.getAddress().trim());
+        shelter.setDistrict(district);
+        shelter.setType(form.getType());
+        shelter.setCapacity(form.getCapacity());
+        shelter.setAccessible(form.isAccessible());
+        shelters.save(shelter);
+        log.info("Оновлено укриття id={}", id);
+        return ShelterView.from(shelter);
+    }
+
+    private District checkBusinessRules(ShelterForm form, Integer currentId) {
+        Map<String, String> errors = new LinkedHashMap<>();
+        String address = form.getAddress().trim();
+        if (shelters.existsByAddress(address, currentId)) {
+            errors.put("address", "Укриття за адресою «" + address + "» вже зареєстровано");
+        }
+        District district = districts.findById(form.getDistrictId()).orElse(null);
+        if (district == null) {
+            errors.put("districtId", "Такого району немає");
+        }
+        if (!errors.isEmpty()) {
+            log.warn("Порушено бізнес-правила: {}", errors);
+            throw new ValidationException(errors);
+        }
+        return district;
     }
 
     public void delete(int id) {
@@ -134,14 +149,5 @@ public class ShelterService {
     private Shelter getShelter(int id) {
         return shelters.findById(id)
                 .orElseThrow(() -> new NotFoundException("Укриття з id=" + id + " не знайдено"));
-    }
-
-    private ShelterType parseType(String value, List<String> errors) {
-        try {
-            return ShelterType.valueOf(value);
-        } catch (IllegalArgumentException | NullPointerException e) {
-            errors.add("Оберіть тип укриття");
-            return null;
-        }
     }
 }

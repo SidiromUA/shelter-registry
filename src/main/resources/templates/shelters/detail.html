@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(title=${shelter.name})}"></head>
+<body>
+<div th:replace="~{fragments/layout :: header}"></div>
+
+<main id="main">
+  <p><a th:href="@{/shelters}">← До списку</a></p>
+  <h1 th:text="${shelter.name}">Укриття</h1>
+  <div th:replace="~{fragments/layout :: flash}"></div>
+
+  <dl class="details">
+    <dt>Адреса</dt>           <dd th:text="${shelter.address}">—</dd>
+    <dt>Район</dt>            <dd th:text="${shelter.district}">—</dd>
+    <dt>Тип</dt>              <dd th:text="${shelter.type}">—</dd>
+    <dt>Місткість</dt>        <dd th:text="|${shelter.capacity} осіб|">—</dd>
+    <dt>Доступність для маломобільних груп</dt> <dd th:text="${shelter.accessibility}">—</dd>
+    <dt>Стан</dt>
+    <dd><span th:class="|status status-${#strings.replace(#strings.toLowerCase(shelter.statusCode), '_', '-')}|"
+              th:text="${shelter.status}">—</span></dd>
+    <dt>Остання перевірка</dt>
+    <dd th:text="${shelter.lastInspectionDate != null} ? ${#temporals.format(shelter.lastInspectionDate, 'dd.MM.yyyy')} : 'не проводилась'">—</dd>
+  </dl>
+
+  <p class="actions">
+    <a class="button" th:href="@{/shelters/{id}/edit(id=${shelter.id})}">Редагувати</a>
+  </p>
+  <form th:action="@{/shelters/{id}/delete(id=${shelter.id})}" method="post"
+        onsubmit="return confirm('Видалити укриття разом з історією перевірок?')">
+    <button type="submit" class="danger">Видалити</button>
+  </form>
+
+  <h2>Перевірки</h2>
+  <table th:unless="${inspections.isEmpty()}">
+    <caption>Історія перевірок</caption>
+    <thead><tr><th scope="col">Дата</th><th scope="col">Результат</th><th scope="col">Примітки</th></tr></thead>
+    <tbody>
+    <tr th:each="i : ${inspections}">
+      <td th:text="${#temporals.format(i.date, 'dd.MM.yyyy')}">01.01.2027</td>
+      <td th:text="${i.result.label}">Пройдено</td>
+      <td th:text="${i.notes} ?: '—'">—</td>
+    </tr>
+    </tbody>
+  </table>
+  <p th:if="${inspections.isEmpty()}">Перевірок ще не було.</p>
+
+  <h3>Зареєструвати перевірку</h3>
+  <form th:action="@{/shelters/{id}/inspections(id=${shelter.id})}" method="post">
+    <fieldset class="field">
+      <legend>Результат</legend>
+      <label th:each="r, st : ${results}">
+        <input type="radio" name="result" th:value="${r}" th:checked="${st.first}"> <span th:text="${r.label}">Результат</span>
+      </label>
+    </fieldset>
+    <div class="field">
+      <label for="notes">Примітки</label>
+      <input id="notes" name="notes" type="text" maxlength="1000">
+    </div>
+    <button type="submit">Зберегти перевірку</button>
+  </form>
+</main>
+</body>
+</html>

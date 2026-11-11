@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(title='Укриття')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: header}"></div>
+
+<main id="main">
+  <h1>Укриття міста</h1>
+  <div th:replace="~{fragments/layout :: flash}"></div>
+
+  <!-- GET-форма: параметр districtId потрапляє в URL (/shelters?districtId=5) -->
+  <form th:action="@{/shelters}" method="get" class="filter">
+    <label for="districtId">Район</label>
+    <select id="districtId" name="districtId">
+      <option value="0">Усі райони</option>
+      <option th:each="d : ${districts}" th:value="${d.id}" th:text="${d.name}"
+              th:selected="${d.id == selectedDistrict}">Район</option>
+    </select>
+    <button type="submit">Показати</button>
+  </form>
+
+  <table>
+    <caption th:text="|Знайдено укриттів: ${shelters.size()}, загальна місткість: ${totalCapacity} осіб|">
+      Укриття
+    </caption>
+    <thead>
+    <tr>
+      <th scope="col">Назва</th><th scope="col">Адреса</th><th scope="col">Район</th>
+      <th scope="col">Тип</th><th scope="col">Місткість, осіб</th>
+      <th scope="col">Доступність</th><th scope="col">Стан</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- th:text екранує HTML, тому дані користувачів не можуть «вбудувати» скрипт (XSS) -->
+    <tr th:each="s : ${shelters}">
+      <td><a th:href="@{/shelters/{id}(id=${s.id})}" th:text="${s.name}">Назва</a></td>
+      <td th:text="${s.address}">Адреса</td>
+      <td th:text="${s.district}">Район</td>
+      <td th:text="${s.type}">Тип</td>
+      <td th:text="${s.capacity}">0</td>
+      <td th:text="${s.accessibility}">Ні</td>
+      <td><span th:class="|status status-${#strings.replace(#strings.toLowerCase(s.statusCode), '_', '-')}|"
+                th:text="${s.status}">Стан</span></td>
+    </tr>
+    <tr th:if="${shelters.isEmpty()}">
+      <td colspan="7">У цьому районі укриттів ще не зареєстровано.</td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

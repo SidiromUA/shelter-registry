@@ -70,9 +70,10 @@ public class JdbcShelterRepository implements ShelterRepository {
     }
 
     @Override
-    public boolean existsByAddress(String address) {
-        return jdbc.sql("SELECT COUNT(*) FROM shelters WHERE address = :address")
+    public boolean existsByAddress(String address, Integer excludeId) {
+        return jdbc.sql("SELECT COUNT(*) FROM shelters WHERE address = :address AND id <> :excludeId")
                 .param("address", address)
+                .param("excludeId", excludeId == null ? -1 : excludeId)
                 .query(Integer.class).single() > 0;
     }
 

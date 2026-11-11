@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(title=${shelterId} ? 'Редагування укриття' : 'Нове укриття')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: header}"></div>
+
+<main id="main">
+  <h1 th:text="${shelterId} ? 'Редагування укриття' : 'Нове укриття'">Нове укриття</h1>
+
+  <div class="errors" role="alert" th:if="${#fields.hasErrors('${form.*}')}">
+    <h2>Виправте помилки</h2>
+    <ul><li th:each="e : ${#fields.errors('${form.*}')}" th:text="${e}">Помилка</li></ul>
+  </div>
+
+  <!-- th:object + th:field: значення полів беруться з об’єкта form і повертаються в нього після надсилання -->
+  <form th:action="${shelterId} ? @{/shelters/{id}(id=${shelterId})} : @{/shelters}"
+        th:object="${form}" method="post" novalidate>
+
+    <div class="field">
+      <label for="name">Назва</label>
+      <input type="text" th:field="*{name}" required
+             th:aria-invalid="${#fields.hasErrors('name')} ? 'true'"
+             th:aria-describedby="${#fields.hasErrors('name')} ? 'name-error'">
+      <p class="field-error" id="name-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Помилка</p>
+    </div>
+
+    <div class="field">
+      <label for="address">Адреса</label>
+      <input type="text" th:field="*{address}" required
+             th:aria-describedby="${#fields.hasErrors('address')} ? 'address-error'">
+      <p class="field-error" id="address-error" th:if="${#fields.hasErrors('address')}" th:errors="*{address}">Помилка</p>
+    </div>
+
+    <div class="field">
+      <label for="districtId">Район</label>
+      <select th:field="*{districtId}" required>
+        <option value="">— оберіть район —</option>
+        <option th:each="d : ${districts}" th:value="${d.id}" th:text="${d.name}">Район</option>
+      </select>
+      <p class="field-error" th:if="${#fields.hasErrors('districtId')}" th:errors="*{districtId}">Помилка</p>
+    </div>
+
+    <fieldset class="field">
+      <legend>Тип укриття</legend>
+      <label th:each="t : ${types}">
+        <input type="radio" th:field="*{type}" th:value="${t}"> <span th:text="${t.label}">Тип</span>
+      </label>
+      <p class="field-error" th:if="${#fields.hasErrors('type')}" th:errors="*{type}">Помилка</p>
+    </fieldset>
+
+    <div class="field">
+      <label for="capacity">Місткість, осіб</label>
+      <input type="number" th:field="*{capacity}" min="1" max="10000" required>
+      <p class="field-error" th:if="${#fields.hasErrors('capacity')}" th:errors="*{capacity}">Помилка</p>
+    </div>
+
+    <div class="field">
+      <label><input type="checkbox" th:field="*{accessible}"> Доступне для маломобільних груп</label>
+    </div>
+
+    <button type="submit">Зберегти</button>
+    <a th:href="${shelterId} ? @{/shelters/{id}(id=${shelterId})} : @{/shelters}">Скасувати</a>
+  </form>
+</main>
+</body>
+</html>

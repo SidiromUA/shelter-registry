@@ -2,9 +2,11 @@ package ua.edu.ldubgd.shelters.dto;
 
 import ua.edu.ldubgd.shelters.model.Shelter;
 
+import java.time.LocalDate;
+
 /**
- * DTO для відображення: лише ті поля, які потрібні сторінці, вже у «людському» вигляді.
- * Представлення (view) не працює з сутністю напряму.
+ * DTO для відображення (сторінки, JSON): лише потрібні поля у «людському» вигляді.
+ * Сутність назовні не віддаємо — так змінювати модель БД можна без змін у API.
  */
 public record ShelterView(
         int id,
@@ -15,7 +17,8 @@ public record ShelterView(
         int capacity,
         String accessibility,
         String status,
-        String statusCode) {
+        String statusCode,
+        LocalDate lastInspectionDate) {
 
     public static ShelterView from(Shelter s) {
         return new ShelterView(
@@ -27,6 +30,7 @@ public record ShelterView(
                 s.getCapacity(),
                 s.isAccessible() ? "Так" : "Ні",
                 s.getStatus().getLabel(),
-                s.getStatus().name());
+                s.getStatus().name(),
+                s.getLastInspectionDate());
     }
 }

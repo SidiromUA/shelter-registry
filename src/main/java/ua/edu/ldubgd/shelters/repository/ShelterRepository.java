@@ -17,7 +17,8 @@ public interface ShelterRepository {
 
     List<Shelter> findByDistrictId(int districtId);
 
-    boolean existsByAddress(String address);
+    /** Чи є інше укриття з такою адресою (excludeId — id поточного укриття під час редагування). */
+    boolean existsByAddress(String address, Integer excludeId);
 
     Shelter save(Shelter shelter);
 

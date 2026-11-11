@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<!-- Спільні фрагменти сторінок: підключаються через th:replace="~{fragments/layout :: head(title='...')}" -->
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="head(title)">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title th:text="${title} + ' — Реєстр укриттів'">Реєстр укриттів</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+<div th:fragment="header">
+  <a class="skip-link" href="#main">Перейти до основного вмісту</a>
+  <header class="site-header">
+    <p class="logo">Реєстр укриттів</p>
+    <nav aria-label="Основна навігація">
+      <ul>
+        <li><a th:href="@{/shelters}">Укриття</a></li>
+        <li><a th:href="@{/shelters/new}">Додати укриття</a></li>
+        <li><a th:href="@{/swagger-ui.html}">API</a></li>
+      </ul>
+    </nav>
+  </header>
+</div>
+
+<div th:fragment="flash">
+  <p class="message" role="status" th:if="${message}" th:text="${message}">Повідомлення</p>
+</div>
+</body>
+</html>

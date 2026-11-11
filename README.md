@@ -139,10 +139,43 @@ mvn spring-boot:run                                   # профіль dev — �
 # http://localhost:8080/h2-console  (JDBC URL: jdbc:h2:mem:shelters, користувач sa, без пароля)
 
 mvn package
-SPRING_PROFILES_ACTIVE=prod java -jar target/shelter-registry-0.6.0.jar     # PostgreSQL
-java -jar target/shelter-registry-0.6.0.jar --registry.inspection-interval-days=30 --server.port=9090
+SPRING_PROFILES_ACTIVE=prod java -jar target/shelter-registry-*.jar     # PostgreSQL
+java -jar target/shelter-registry-*.jar --registry.inspection-interval-days=30 --server.port=9090
 
 docker compose up --build                             # застосунок + PostgreSQL у контейнерах
 ```
 
 Нові ендпоінти: `GET /api/shelters/overdue` (прострочені перевірки), `GET /actuator/health`, `GET /actuator/info`.
+
+### ЛР7 — вебсторінки (Thymeleaf) і RESTful API
+
+**Вебінтерфейс** (`ShelterWebController`, шаблони в `src/main/resources/templates/`):
+
+| URL | Сторінка |
+|---|---|
+| `GET /shelters?districtId=5` | список з фільтром за районом (запам’ятовується в cookie) |
+| `GET /shelters/{id}` | картка укриття, історія перевірок, реєстрація перевірки |
+| `GET /shelters/new`, `POST /shelters` | створення: помилки валідації — біля полів форми |
+| `GET /shelters/{id}/edit`, `POST /shelters/{id}` | редагування |
+| `POST /shelters/{id}/delete` | видалення |
+
+**REST API** (`ShelterApiController`), документація — http://localhost:8080/swagger-ui.html:
+
+| Метод і шлях | Дія | Коди відповіді |
+|---|---|---|
+| `GET /api/shelters` | список | 200 |
+| `GET /api/shelters/{id}` | одне укриття | 200, 404 |
+| `POST /api/shelters` | створити | 201 + `Location`, 400 |
+| `PUT /api/shelters/{id}` | оновити | 200, 400, 404 |
+| `DELETE /api/shelters/{id}` | видалити | 204, 404 |
+| `GET /api/shelters/{id}/inspections` | перевірки | 200, 404 |
+| `POST /api/shelters/{id}/inspections` | зареєструвати перевірку | 200, 400, 404, 409 |
+
+Валідація: анотації Bean Validation у `ShelterForm` + `@Valid`; бізнес-правила — у `ShelterService`.
+Помилки API — у форматі Problem Details (RFC 9457), обробник `ApiExceptionHandler`:
+
+```bash
+curl -X POST localhost:8080/api/shelters -H 'Content-Type: application/json' \
+     -d '{"name":"","districtId":4,"type":"BASEMENT","capacity":0}'
+# {"title":"Некоректні дані","status":400,"errors":{"name":"Вкажіть назву укриття", ...}}
+```

@@ -1,28 +1,38 @@
 package ua.edu.ldubgd.shelters.api;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import ua.edu.ldubgd.shelters.dto.InspectionRequest;
+import ua.edu.ldubgd.shelters.dto.ShelterForm;
 import ua.edu.ldubgd.shelters.dto.ShelterView;
-import ua.edu.ldubgd.shelters.exception.NotFoundException;
 import ua.edu.ldubgd.shelters.model.District;
 import ua.edu.ldubgd.shelters.model.Inspection;
 import ua.edu.ldubgd.shelters.service.ShelterService;
 
+import java.net.URI;
 import java.util.List;
-import java.util.Map;
 
 /**
- * Перший REST-контролер. Порівняйте з ShelterServlet (ЛР4):
- * немає doGet/request/response, маршрут задає анотація, а об’єкти автоматично перетворюються на JSON.
+ * RESTful API укриттів. Ресурси — іменники у множині, дії — HTTP-методи:
+ * GET (читання), POST (створення), PUT (заміна), DELETE (видалення).
+ * Помилки обробляє ApiExceptionHandler і повертає їх у форматі Problem Details (RFC 9457).
  */
 @RestController
 @RequestMapping("/api")
+@Tag(name = "Укриття", description = "Реєстр укриттів і перевірок")
 public class ShelterApiController {
 
     private final ShelterService service;
@@ -31,38 +41,65 @@ public class ShelterApiController {
         this.service = service;
     }
 
-    /** GET /api/shelters або /api/shelters?districtId=5 */
+    @Operation(summary = "Список укриттів", description = "Можна відфільтрувати за районом: ?districtId=5")
     @GetMapping("/shelters")
-    public List<ShelterView> shelters(@RequestParam(required = false) Integer districtId) {
+    public List<ShelterView> list(@RequestParam(required = false) Integer districtId) {
         return districtId == null ? service.findAll() : service.findByDistrict(districtId);
     }
 
-    /** GET /api/shelters/overdue — укриття з простроченою перевіркою (ЛР6) */
+    @Operation(summary = "Укриття з простроченою перевіркою")
     @GetMapping("/shelters/overdue")
     public List<ShelterView> overdue() {
         return service.findOverdueInspection();
     }
 
-    /** GET /api/shelters/3 */
+    @Operation(summary = "Укриття за ідентифікатором")
+    @ApiResponse(responseCode = "404", description = "Укриття не знайдено")
     @GetMapping("/shelters/{id}")
-    public ShelterView shelter(@PathVariable int id) {
+    public ShelterView get(@PathVariable int id) {
         return service.findById(id);
     }
 
+    @Operation(summary = "Створити укриття")
+    @ApiResponse(responseCode = "201", description = "Створено; адреса нового ресурсу — у заголовку Location")
+    @ApiResponse(responseCode = "400", description = "Некоректні дані")
+    @PostMapping("/shelters")
+    public ResponseEntity<ShelterView> create(@Valid @RequestBody ShelterForm form) {
+        ShelterView created = service.create(form);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}").buildAndExpand(created.id()).toUri();
+        return ResponseEntity.created(location).body(created);
+    }
+
+    @Operation(summary = "Оновити укриття")
+    @PutMapping("/shelters/{id}")
+    public ShelterView update(@PathVariable int id, @Valid @RequestBody ShelterForm form) {
+        return service.update(id, form);
+    }
+
+    @Operation(summary = "Видалити укриття")
+    @ApiResponse(responseCode = "204", description = "Видалено")
+    @DeleteMapping("/shelters/{id}")
+    public ResponseEntity<Void> delete(@PathVariable int id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Перевірки укриття")
     @GetMapping("/shelters/{id}/inspections")
     public List<Inspection> inspections(@PathVariable int id) {
         return service.findInspections(id);
     }
 
+    @Operation(summary = "Зареєструвати перевірку", description = "Стан укриття змінюється за результатом перевірки")
+    @PostMapping("/shelters/{id}/inspections")
+    public ShelterView inspect(@PathVariable int id, @Valid @RequestBody InspectionRequest request) {
+        return service.registerInspection(id, request.inspectorId(), request.result(), request.notes());
+    }
+
+    @Operation(summary = "Райони міста")
     @GetMapping("/districts")
     public List<District> districts() {
         return service.findAllDistricts();
-    }
-
-    /** Неіснуюче укриття → HTTP 404 (детальна обробка помилок — у ЛР7). */
-    @ExceptionHandler(NotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> notFound(NotFoundException e) {
-        return Map.of("error", e.getMessage());
     }
 }

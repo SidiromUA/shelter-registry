@@ -14,7 +14,7 @@
 
     <groupId>ua.edu.ldubgd</groupId>
     <artifactId>shelter-registry</artifactId>
-    <version>0.6.0</version>
+    <version>0.7.0</version>
     <name>Реєстр укриттів</name>
 
     <properties>
@@ -57,6 +57,18 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- ЛР7: шаблонізатор Thymeleaf для вебсторінок -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <!-- ЛР7: документація API OpenAPI 3 + Swagger UI (/swagger-ui.html) -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>3.2.0</version>
         </dependency>
 
         <dependency>

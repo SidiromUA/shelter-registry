@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(title='Не знайдено')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: header}"></div>
+<main id="main">
+  <h1>Сторінку не знайдено (404)</h1>
+  <p th:text="${message} ?: 'Такої сторінки не існує.'">Такої сторінки не існує.</p>
+  <p><a th:href="@{/shelters}">До списку укриттів</a></p>
+</main>
+</body>
+</html>
