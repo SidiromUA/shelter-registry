@@ -1,0 +1,33 @@
+<!-- ЛР3. НАВМИСНО НЕДОСТУПНА версія сторінки. Знайдіть і виправте порушення WCAG 2.2.
+     Перевірте її через Lighthouse (DevTools → Lighthouse → Accessibility) і розширення axe DevTools. -->
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial; color: #999; }
+    .menu span { cursor: pointer; margin-right: 15px; color: #bbb; }
+    .ready { color: green; } .not-ready { color: red; }
+    input { border: 1px solid #eee; }
+  </style>
+</head>
+<body>
+  <div class="menu">
+    <span onclick="location.href='index.html'">Укриття</span>
+    <span onclick="location.href='#'">Райони</span>
+  </div>
+
+  <div style="font-size: 32px; font-weight: bold">Укриття міста</div>
+  <img src="map.png">
+
+  <div>
+    <div><b>Укриття № 1</b> — вул. Клепарівська, 35 — <span class="ready">●</span></div>
+    <div><b>Укриття № 4</b> — просп. Червоної Калини, 60 — <span class="not-ready">●</span></div>
+  </div>
+
+  <div style="font-size: 24px; font-weight: bold">Додати укриття</div>
+  <input type="text" placeholder="Назва">
+  <input type="text" placeholder="Адреса">
+  <input type="text" placeholder="Місткість">
+  <div onclick="alert('Збережено')" style="background:#ccc; display:inline-block; padding:4px">OK</div>
+</body>
+</html>

@@ -63,3 +63,15 @@ mvn compile exec:java
 
 Параметри підключення можна змінити змінними оточення `DB_URL`, `DB_USER`, `DB_PASSWORD`.
 Приклади SQL-запитів — [db/queries.sql](db/queries.sql).
+
+### ЛР3 — багаторівнева архітектура і доступність
+
+```
+controller  →  service  →  repository (інтерфейс)  →  repository.jdbc (реалізація)  →  БД
+    ↓              ↓
+  view          model, dto, exception
+```
+
+`mvn compile exec:java` генерує сторінки `web/shelters.html` і `web/shelters-errors.html`.
+Порівняйте `web/inaccessible-example.html` з `web/index.html` і `web/add-shelter.html` —
+розбір порушень WCAG у [docs/accessibility.md](docs/accessibility.md).

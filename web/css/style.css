@@ -70,3 +70,24 @@ th { background: #f4f7f5; }
   td { border: none; padding: 0.25rem 0; }
   tr { border-bottom: 1px solid var(--border); padding: 0.75rem 0; }
 }
+
+/* ЛР3: форми, повідомлення, приховування для екранних читачів */
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.field { margin: 0 0 1rem; border: 0; padding: 0; }
+.field > label, legend { display: block; font-weight: 600; margin-bottom: 0.25rem; }
+fieldset label { display: block; font-weight: 400; }
+input[type="text"], input[type="number"], select {
+  width: 100%; max-width: 28rem; padding: 0.5rem; font: inherit;
+  border: 1px solid #7b8794; border-radius: 4px;
+}
+.hint { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.9rem; }
+button {
+  padding: 0.6rem 1.4rem; font: inherit; font-weight: 600; color: #fff;
+  background: var(--green); border: 0; border-radius: 4px; cursor: pointer;
+}
+.message { padding: 0.75rem 1rem; background: #e8f3df; border-left: 4px solid var(--green); }
+.errors { padding: 0.75rem 1rem; background: #fdecec; border-left: 4px solid var(--not-ready); }
+.errors h2 { margin: 0 0 0.25rem; font-size: 1.1rem; }

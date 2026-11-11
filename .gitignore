@@ -21,3 +21,7 @@ db.properties
 
 # Tomcat (локальна інсталяція для ЛР4)
 tools/
+
+# Сторінки, згенеровані App (ЛР3)
+web/shelters.html
+web/shelters-errors.html

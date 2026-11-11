@@ -1,47 +1,41 @@
 package ua.edu.ldubgd.shelters;
 
-import ua.edu.ldubgd.shelters.jdbc.InspectionDao;
-import ua.edu.ldubgd.shelters.jdbc.ShelterDao;
-import ua.edu.ldubgd.shelters.jdbc.SqlInjectionDemo;
+import ua.edu.ldubgd.shelters.controller.ShelterController;
+import ua.edu.ldubgd.shelters.dto.CreateShelterRequest;
+import ua.edu.ldubgd.shelters.repository.jdbc.JdbcDistrictRepository;
+import ua.edu.ldubgd.shelters.repository.jdbc.JdbcInspectionRepository;
+import ua.edu.ldubgd.shelters.repository.jdbc.JdbcShelterRepository;
+import ua.edu.ldubgd.shelters.service.ShelterService;
+import ua.edu.ldubgd.shelters.view.ShelterListPage;
 
-import java.sql.SQLException;
-import java.time.LocalDate;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-/** ЛР2. Консольна демонстрація роботи з БД через JDBC. */
+/**
+ * ЛР3. Збирання застосунку «вручну»: створюємо об’єкти шарів і передаємо залежності через конструктори.
+ * Результат роботи контролера — HTML-сторінка web/shelters.html.
+ */
 public class App {
 
-    public static void main(String[] args) throws SQLException {
-        ShelterDao shelters = new ShelterDao();
-        InspectionDao inspections = new InspectionDao();
+    public static void main(String[] args) throws IOException {
+        // Composition root: тут «з’єднуються» всі шари. У ЛР5 це зробить Spring.
+        ShelterService service = new ShelterService(
+                new JdbcShelterRepository(),
+                new JdbcDistrictRepository(),
+                new JdbcInspectionRepository());
+        ShelterController controller = new ShelterController(service, new ShelterListPage());
 
-        System.out.println("=== Усі укриття ===");
-        shelters.findAll().forEach(System.out::println);
+        // Некоректний запит — сторінка з переліком помилок валідації
+        String page = controller.create(new CreateShelterRequest("", "пл. Ринок, 10", 99, "CAVE", -5, false));
+        Path errorsPage = Path.of("web", "shelters-errors.html");
+        Files.writeString(errorsPage, page);
+        System.out.println("Сторінку з помилками збережено: " + errorsPage.toAbsolutePath());
 
-        System.out.println("\n=== Укриття Франківського району ===");
-        shelters.findByDistrict("Франківський").forEach(System.out::println);
-
-        System.out.println("\n=== Місткість за районами ===");
-        shelters.capacityByDistrict().forEach((d, c) -> System.out.printf("%-16s %5d%n", d, c));
-
-        System.out.println("\n=== Додавання та видалення ===");
-        int id = shelters.insert("Тимчасове укриття", "вул. Тестова, 1", 1, "BASEMENT", 40, false);
-        System.out.println("Додано: " + shelters.findById(id).orElseThrow());
-        System.out.println("Видалено: " + shelters.delete(id));
-
-        System.out.println("\n=== Транзакція: реєстрація перевірки ===");
-        inspections.registerInspection(4, 2, LocalDate.now(), "PASSED", "Недоліки усунено");
-        System.out.println("Після перевірки: " + shelters.findById(4).orElseThrow());
-
-        try {
-            inspections.registerInspection(999, 2, LocalDate.now(), "PASSED", null);
-        } catch (SQLException e) {
-            System.out.println("Помилка, транзакцію відкочено: " + e.getMessage());
-        }
-
-        System.out.println("\n=== SQL-ін’єкція ===");
-        SqlInjectionDemo demo = new SqlInjectionDemo();
-        String attack = "' OR '1'='1";
-        System.out.println("Небезпечний запит з «" + attack + "»: " + demo.unsafeCount(attack) + " записів");
-        System.out.println("PreparedStatement з тим самим рядком: " + demo.safeCount(attack) + " записів");
+        // Звичайний перегляд списку
+        Path listPage = Path.of("web", "shelters.html");
+        Files.writeString(listPage, controller.list());
+        System.out.println("Сторінку зі списком збережено: " + listPage.toAbsolutePath());
+        System.out.println("Відкрийте її через jwebserver і перевірте доступність (Lighthouse / axe).");
     }
 }

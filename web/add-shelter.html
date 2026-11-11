@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Додати укриття — Реєстр укриттів</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Перейти до основного вмісту</a>
+  <header class="site-header">
+    <p class="logo">Реєстр укриттів</p>
+    <nav aria-label="Основна навігація">
+      <ul>
+        <li><a href="index.html">Укриття</a></li>
+        <li><a href="add-shelter.html" aria-current="page">Додати укриття</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+    <h1>Додати укриття</h1>
+    <p>Поля, позначені <span aria-hidden="true">*</span><span class="visually-hidden">зірочкою</span>, обов’язкові.</p>
+
+    <!-- Форма запрацює в ЛР4, коли з’явиться сервлет /shelters -->
+    <form action="/shelters" method="post" novalidate>
+      <div class="field">
+        <label for="name">Назва <span aria-hidden="true">*</span></label>
+        <input id="name" name="name" type="text" required autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label for="address">Адреса <span aria-hidden="true">*</span></label>
+        <input id="address" name="address" type="text" required autocomplete="street-address"
+               aria-describedby="address-hint">
+        <p id="address-hint" class="hint">Наприклад: вул. Наукова, 7</p>
+      </div>
+
+      <div class="field">
+        <label for="district">Район <span aria-hidden="true">*</span></label>
+        <select id="district" name="districtId" required>
+          <option value="">— оберіть район —</option>
+          <option value="1">Галицький</option>
+          <option value="2">Залізничний</option>
+          <option value="3">Личаківський</option>
+          <option value="4">Сихівський</option>
+          <option value="5">Франківський</option>
+          <option value="6">Шевченківський</option>
+        </select>
+      </div>
+
+      <fieldset class="field">
+        <legend>Тип укриття <span aria-hidden="true">*</span></legend>
+        <label><input type="radio" name="type" value="BASEMENT" required> Підвал</label>
+        <label><input type="radio" name="type" value="PARKING"> Паркінг</label>
+        <label><input type="radio" name="type" value="CIVIL_DEFENCE"> Захисна споруда ЦЗ</label>
+      </fieldset>
+
+      <div class="field">
+        <label for="capacity">Місткість, осіб <span aria-hidden="true">*</span></label>
+        <input id="capacity" name="capacity" type="number" min="1" required inputmode="numeric">
+      </div>
+
+      <div class="field">
+        <label><input type="checkbox" name="accessible" value="true">
+          Доступне для маломобільних груп (пандус, ліфт)</label>
+      </div>
+
+      <button type="submit">Зберегти</button>
+    </form>
+  </main>
+</body>
+</html>
