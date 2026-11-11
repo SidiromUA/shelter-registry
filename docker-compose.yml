@@ -9,9 +9,7 @@ services:
       POSTGRES_PASSWORD: shelter
     volumes:
       - db-data:/var/lib/postgresql/data
-      # під час першого запуску PostgreSQL виконає ці скрипти за абеткою
-      - ./src/main/resources/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
-      - ./src/main/resources/db/data.sql:/docker-entrypoint-initdb.d/02-data.sql:ro
+      # схему і дані створює Flyway під час запуску застосунку (ЛР8)
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U shelter -d shelter_registry"]
       interval: 5s

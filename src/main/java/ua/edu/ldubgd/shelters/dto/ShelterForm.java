@@ -40,7 +40,7 @@ public class ShelterForm {
         ShelterForm f = new ShelterForm();
         f.setName(s.getName());
         f.setAddress(s.getAddress());
-        f.setDistrictId(s.getDistrict().id());
+        f.setDistrictId(s.getDistrict().getId());
         f.setType(s.getType());
         f.setCapacity(s.getCapacity());
         f.setAccessible(s.isAccessible());

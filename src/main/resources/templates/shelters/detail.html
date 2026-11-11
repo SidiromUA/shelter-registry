@@ -22,28 +22,32 @@
     <dd th:text="${shelter.lastInspectionDate != null} ? ${#temporals.format(shelter.lastInspectionDate, 'dd.MM.yyyy')} : 'не проводилась'">—</dd>
   </dl>
 
-  <p class="actions">
-    <a class="button" th:href="@{/shelters/{id}/edit(id=${shelter.id})}">Редагувати</a>
-  </p>
-  <form th:action="@{/shelters/{id}/delete(id=${shelter.id})}" method="post"
-        onsubmit="return confirm('Видалити укриття разом з історією перевірок?')">
-    <button type="submit" class="danger">Видалити</button>
-  </form>
+  <div th:if="${isAdmin}">
+    <p class="actions">
+      <a class="button" th:href="@{/shelters/{id}/edit(id=${shelter.id})}">Редагувати</a>
+    </p>
+    <form th:action="@{/shelters/{id}/delete(id=${shelter.id})}" method="post"
+          onsubmit="return confirm('Видалити укриття разом з історією перевірок?')">
+      <button type="submit" class="danger">Видалити</button>
+    </form>
+  </div>
 
   <h2>Перевірки</h2>
   <table th:unless="${inspections.isEmpty()}">
     <caption>Історія перевірок</caption>
-    <thead><tr><th scope="col">Дата</th><th scope="col">Результат</th><th scope="col">Примітки</th></tr></thead>
+    <thead><tr><th scope="col">Дата</th><th scope="col">Результат</th><th scope="col">Інспектор</th><th scope="col">Примітки</th></tr></thead>
     <tbody>
     <tr th:each="i : ${inspections}">
       <td th:text="${#temporals.format(i.date, 'dd.MM.yyyy')}">01.01.2027</td>
-      <td th:text="${i.result.label}">Пройдено</td>
+      <td th:text="${i.resultLabel}">Пройдено</td>
+      <td th:text="${i.inspector}">Інспектор</td>
       <td th:text="${i.notes} ?: '—'">—</td>
     </tr>
     </tbody>
   </table>
   <p th:if="${inspections.isEmpty()}">Перевірок ще не було.</p>
 
+  <section th:if="${canInspect}">
   <h3>Зареєструвати перевірку</h3>
   <form th:action="@{/shelters/{id}/inspections(id=${shelter.id})}" method="post">
     <fieldset class="field">
@@ -58,6 +62,8 @@
     </div>
     <button type="submit">Зберегти перевірку</button>
   </form>
+  </section>
+  <p th:unless="${canInspect}"><a th:href="@{/login}">Увійдіть</a> як інспектор, щоб зареєструвати перевірку.</p>
 </main>
 </body>
 </html>

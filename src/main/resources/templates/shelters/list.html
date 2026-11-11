@@ -20,7 +20,7 @@
   </form>
 
   <table>
-    <caption th:text="|Знайдено укриттів: ${shelters.size()}, загальна місткість: ${totalCapacity} осіб|">
+    <caption th:text="|Знайдено укриттів: ${found}|">
       Укриття
     </caption>
     <thead>
@@ -47,6 +47,13 @@
     </tr>
     </tbody>
   </table>
+
+  <!-- ЛР8: пагінація (лише для списку без фільтра) -->
+  <nav th:if="${page != null and page.totalPages > 1}" aria-label="Сторінки списку" class="pagination">
+    <a th:if="${page.hasPrevious()}" th:href="@{/shelters(page=${page.number - 1})}">← Попередня</a>
+    <span th:text="|Сторінка ${page.number + 1} з ${page.totalPages}|">Сторінка 1 з 2</span>
+    <a th:if="${page.hasNext()}" th:href="@{/shelters(page=${page.number + 1})}">Наступна →</a>
+  </nav>
 </main>
 </body>
 </html>

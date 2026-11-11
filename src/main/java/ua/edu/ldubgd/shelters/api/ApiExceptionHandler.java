@@ -1,6 +1,7 @@
 package ua.edu.ldubgd.shelters.api;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -41,6 +42,13 @@ public class ApiExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ProblemDetail unreadable(HttpMessageNotReadableException e) {
         return problem(HttpStatus.BAD_REQUEST, "Тіло запиту не вдалося прочитати", Map.of());
+    }
+
+    /** Сортування за неіснуючим полем: ?sort=abc */
+    @ExceptionHandler(PropertyReferenceException.class)
+    public ProblemDetail badSort(PropertyReferenceException e) {
+        return problem(HttpStatus.BAD_REQUEST, "Некоректний параметр сортування",
+                Map.of("sort", "Невідоме поле: " + e.getPropertyName()));
     }
 
     @ExceptionHandler(NotFoundException.class)

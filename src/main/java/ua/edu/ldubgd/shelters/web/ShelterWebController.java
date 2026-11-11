@@ -3,6 +3,9 @@ package ua.edu.ldubgd.shelters.web;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -22,6 +25,7 @@ import ua.edu.ldubgd.shelters.model.InspectionResult;
 import ua.edu.ldubgd.shelters.model.ShelterType;
 import ua.edu.ldubgd.shelters.service.ShelterService;
 
+import java.security.Principal;
 import java.util.List;
 
 /**
@@ -57,6 +61,7 @@ public class ShelterWebController {
      */
     @GetMapping
     public String list(@RequestParam(required = false) Integer districtId,
+                       @RequestParam(defaultValue = "0") int page,
                        @CookieValue(name = DISTRICT_COOKIE, required = false) Integer savedDistrict,
                        HttpServletResponse response, Model model) {
         Integer filter = districtId;
@@ -73,10 +78,18 @@ public class ShelterWebController {
                 filter = null;
             }
         }
-        List<ShelterView> shelters = filter == null ? service.findAll() : service.findByDistrict(filter);
-        model.addAttribute("shelters", shelters);
+        if (filter == null) {
+            // Без фільтра — посторінково, по 10 записів, за назвою (ЛР8)
+            Page<ShelterView> result = service.findPage(PageRequest.of(Math.max(page, 0), 10, Sort.by("name")));
+            model.addAttribute("page", result);
+            model.addAttribute("shelters", result.getContent());
+            model.addAttribute("found", result.getTotalElements());
+        } else {
+            List<ShelterView> shelters = service.findByDistrict(filter);
+            model.addAttribute("shelters", shelters);
+            model.addAttribute("found", shelters.size());
+        }
         model.addAttribute("selectedDistrict", filter);
-        model.addAttribute("totalCapacity", shelters.stream().mapToInt(ShelterView::capacity).sum());
         return "shelters/list";
     }
 
@@ -143,9 +156,10 @@ public class ShelterWebController {
 
     @PostMapping("/{id}/inspections")
     public String inspect(@PathVariable int id, @RequestParam InspectionResult result,
-                          @RequestParam(required = false) String notes, RedirectAttributes redirect) {
-        // До ЛР8 (Spring Security) інспектор фіксований — id=2 з тестових даних
-        service.registerInspection(id, 2, result, notes);
+                          @RequestParam(required = false) String notes, Principal principal,
+                          RedirectAttributes redirect) {
+        // Principal — користувач, що увійшов (Spring Security); він і є інспектором
+        service.registerInspection(id, principal.getName(), result, notes);
         redirect.addFlashAttribute("message", "Перевірку зареєстровано");
         return "redirect:/shelters/" + id;
     }

@@ -1,14 +1,14 @@
--- ЛР2. Тестові дані (навчальні, не відповідають реальним об’єктам)
+-- ЛР8. Міграція Flyway V2: тестові дані (навчальні, не відповідають реальним об’єктам)
 
 INSERT INTO districts (name) VALUES
     ('Галицький'), ('Залізничний'), ('Личаківський'),
     ('Сихівський'), ('Франківський'), ('Шевченківський');
 
--- Паролі: admin / admin, inspector / inspector (BCrypt знадобиться в ЛР8; поки що — заглушка)
+-- Паролі: admin / admin, inspector / inspector, kovalenko / inspector. Зберігаються лише хеші BCrypt.
 INSERT INTO users (username, password_hash, full_name, role) VALUES
-    ('admin',     '{noop}admin',     'Адміністратор системи', 'ADMIN'),
-    ('inspector', '{noop}inspector', 'Петренко Олена',        'INSPECTOR'),
-    ('kovalenko', '{noop}inspector', 'Коваленко Андрій',      'INSPECTOR');
+    ('admin',     '{bcrypt}$2y$10$oaUim9D15hJEaW7JdO8qqumKFr5MD8o0TKPNNU0qBEdBUQQdVTrZ2',     'Адміністратор системи', 'ADMIN'),
+    ('inspector', '{bcrypt}$2y$10$.VPcW6TwHvQIV6GOWkToOe5sy3ZLYu10cVpbbhOdXGGD6ijqk4.TW', 'Петренко Олена',        'INSPECTOR'),
+    ('kovalenko', '{bcrypt}$2y$10$.VPcW6TwHvQIV6GOWkToOe5sy3ZLYu10cVpbbhOdXGGD6ijqk4.TW', 'Коваленко Андрій',      'INSPECTOR');
 
 INSERT INTO shelters (name, address, district_id, type, capacity, accessible, status, last_inspection_date) VALUES
     ('Укриття № 1',          'вул. Клепарівська, 35',      6, 'BASEMENT',      120, TRUE,  'READY',     '2027-01-15'),

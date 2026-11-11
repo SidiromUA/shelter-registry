@@ -8,9 +8,9 @@ spring:
     password: ${DB_PASSWORD:shelter}
     hikari:
       maximum-pool-size: 10
-  sql:
-    init:
-      mode: never                    # схему створює адміністратор БД (з ЛР8 — Flyway)
+  flyway:
+    baseline-on-migrate: true        # БД, створену вручну в ЛР2–7 (схема + дані),
+    baseline-version: 2              # Flyway вважатиме вже застосованими міграції V1 і V2
 
 logging:
   level:

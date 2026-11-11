@@ -8,6 +8,10 @@ spring:
     name: shelter-registry
   profiles:
     active: dev                      # за замовчуванням — розроблення
+  jpa:
+    open-in-view: false              # з’єднання з БД не тримається до кінця рендерингу сторінки
+    hibernate:
+      ddl-auto: none                 # схемою керує Flyway, а не Hibernate
 
 server:
   port: ${PORT:8080}                 # значення зі змінної оточення PORT, інакше 8080

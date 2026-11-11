@@ -1,10 +1,6 @@
--- ЛР2. Схема бази даних «Реєстр укриттів» (PostgreSQL)
--- Запуск: psql -h localhost -U shelter -d shelter_registry -f src/main/resources/db/schema.sql
-
-DROP TABLE IF EXISTS inspections;
-DROP TABLE IF EXISTS shelters;
-DROP TABLE IF EXISTS districts;
-DROP TABLE IF EXISTS users;
+-- ЛР8. Міграція Flyway V1: початкова схема БД «Реєстр укриттів».
+-- Flyway виконує кожну міграцію один раз і записує це в таблицю flyway_schema_history.
+-- Змінювати вже застосовані міграції не можна — лише додавати нові (V3__..., V4__...).
 
 CREATE TABLE districts (
     id   SERIAL PRIMARY KEY,

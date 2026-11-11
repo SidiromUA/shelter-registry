@@ -179,3 +179,35 @@ curl -X POST localhost:8080/api/shelters -H 'Content-Type: application/json' \
      -d '{"name":"","districtId":4,"type":"BASEMENT","capacity":0}'
 # {"title":"Некоректні дані","status":400,"errors":{"name":"Вкажіть назву укриття", ...}}
 ```
+
+### ЛР8 — Spring Data JPA, Flyway, Spring Security, тестування
+
+**Дані.** Сутності JPA (`District`, `Shelter`, `Inspection`, `User`) зі зв’язками `@ManyToOne` / `@OneToMany`;
+репозиторії Spring Data (`JpaRepository`): похідні запити (`findByDistrictIdOrderByName`), JPQL (`@Query`),
+пагінація і сортування (`Pageable`), `@EntityGraph` проти проблеми N+1.
+Схемою керує **Flyway**: `src/main/resources/db/migration/V1__schema.sql`, `V2__data.sql`.
+
+**Безпека** (`SecurityConfig`):
+
+| Хто | Вебсторінки | REST API (HTTP Basic) |
+|---|---|---|
+| гість | перегляд списку і карток | `GET` |
+| `inspector` / `inspector` | + реєстрація перевірок | + `POST /api/shelters/{id}/inspections` |
+| `admin` / `admin` | + створення, редагування, видалення | усе |
+
+Паролі зберігаються як хеші BCrypt; форми захищені від CSRF; `delete` у сервісі додатково захищено `@PreAuthorize`.
+
+```bash
+curl "localhost:8080/api/shelters?page=0&size=3&sort=capacity,desc"
+curl -u inspector:inspector -X POST localhost:8080/api/shelters/4/inspections \
+     -H 'Content-Type: application/json' -d '{"result":"PASSED","notes":"Недоліки усунено"}'
+```
+
+**Тести** (`mvn test`, 20 тестів):
+
+| Клас | Рівень | Що перевіряє |
+|---|---|---|
+| `ShelterServiceTest` | модульний (JUnit + Mockito) | бізнес-правила без Spring і БД |
+| `ShelterRepositoryTest` | `@DataJpaTest` | похідні запити, JPQL, пагінація на H2 + Flyway |
+| `ShelterApiControllerTest` | `@WebMvcTest` + MockMvc | коди відповіді, валідація, права доступу |
+| `ShelterRegistryApplicationTests` | `@SpringBootTest` | увесь застосунок: вхід з BCrypt, перевірка інспектором, ролі |

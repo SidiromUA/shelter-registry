@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(title='Вхід')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: header}"></div>
+
+<main id="main">
+  <h1>Вхід до системи</h1>
+
+  <!-- Spring Security додає параметр ?error після невдалого входу і ?logout після виходу -->
+  <p class="errors" role="alert" th:if="${param.error}">Неправильний логін або пароль</p>
+  <p class="message" role="status" th:if="${param.logout}">Ви вийшли із системи</p>
+
+  <form th:action="@{/login}" method="post">
+    <div class="field">
+      <label for="username">Логін</label>
+      <input id="username" name="username" type="text" required autocomplete="username" autofocus>
+    </div>
+    <div class="field">
+      <label for="password">Пароль</label>
+      <input id="password" name="password" type="password" required autocomplete="current-password">
+    </div>
+    <button type="submit">Увійти</button>
+  </form>
+  <p class="hint">Навчальні облікові записи: admin / admin, inspector / inspector.</p>
+</main>
+</body>
+</html>

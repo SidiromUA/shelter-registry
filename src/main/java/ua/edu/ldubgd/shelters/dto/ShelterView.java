@@ -25,7 +25,7 @@ public record ShelterView(
                 s.getId(),
                 s.getName(),
                 s.getAddress(),
-                s.getDistrict().name(),
+                s.getDistrict().getName(),
                 s.getType().getLabel(),
                 s.getCapacity(),
                 s.isAccessible() ? "Так" : "Ні",

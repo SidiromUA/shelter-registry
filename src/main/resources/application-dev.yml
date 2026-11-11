@@ -1,17 +1,15 @@
 # Профіль dev — розроблення: БД H2 у пам’яті, нічого встановлювати не потрібно.
-# Схема і тестові дані створюються під час кожного запуску.
+# Схему і тестові дані створює Flyway (db/migration) під час кожного запуску.
 
 spring:
   datasource:
     url: jdbc:h2:mem:shelters;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
     username: sa
     password:
-  sql:
-    init:
-      mode: always
-      schema-locations: classpath:db/schema.sql
-      data-locations: classpath:db/data.sql
-      encoding: UTF-8
+  jpa:
+    show-sql: true                   # друкувати SQL, який формує Hibernate
+    properties:
+      hibernate.format_sql: true
   h2:
     console:
       enabled: true                  # вебконсоль БД: http://localhost:8080/h2-console
@@ -19,4 +17,4 @@ spring:
 logging:
   level:
     ua.edu.ldubgd.shelters: DEBUG    # детальні журнали нашого коду
-    org.springframework.jdbc.core: DEBUG   # показувати SQL-запити
+    org.hibernate.orm.jdbc.bind: TRACE     # значення параметрів SQL-запитів

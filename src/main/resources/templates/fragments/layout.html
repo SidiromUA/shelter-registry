@@ -17,8 +17,14 @@
     <nav aria-label="Основна навігація">
       <ul>
         <li><a th:href="@{/shelters}">Укриття</a></li>
-        <li><a th:href="@{/shelters/new}">Додати укриття</a></li>
+        <li th:if="${isAdmin}"><a th:href="@{/shelters/new}">Додати укриття</a></li>
         <li><a th:href="@{/swagger-ui.html}">API</a></li>
+        <li th:if="${currentUser == null}"><a th:href="@{/login}">Увійти</a></li>
+        <li th:if="${currentUser != null}">
+          <form th:action="@{/logout}" method="post" class="inline">
+            <button type="submit" class="link-button" th:text="|Вийти (${currentUser})|">Вийти</button>
+          </form>
+        </li>
       </ul>
     </nav>
   </header>

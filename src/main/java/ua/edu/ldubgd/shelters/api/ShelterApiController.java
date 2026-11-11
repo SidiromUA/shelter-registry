@@ -4,6 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,17 +15,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ua.edu.ldubgd.shelters.dto.InspectionRequest;
+import ua.edu.ldubgd.shelters.dto.InspectionView;
+import ua.edu.ldubgd.shelters.dto.PageResponse;
 import ua.edu.ldubgd.shelters.dto.ShelterForm;
 import ua.edu.ldubgd.shelters.dto.ShelterView;
 import ua.edu.ldubgd.shelters.model.District;
-import ua.edu.ldubgd.shelters.model.Inspection;
 import ua.edu.ldubgd.shelters.service.ShelterService;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.List;
 
 /**
@@ -32,7 +36,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api")
-@Tag(name = "Укриття", description = "Реєстр укриттів і перевірок")
+@Tag(name = "Укриття", description = "Реєстр укриттів і перевірок. Зміни — з HTTP Basic (admin/admin, inspector/inspector)")
 public class ShelterApiController {
 
     private final ShelterService service;
@@ -41,10 +45,17 @@ public class ShelterApiController {
         this.service = service;
     }
 
-    @Operation(summary = "Список укриттів", description = "Можна відфільтрувати за районом: ?districtId=5")
+    @Operation(summary = "Список укриттів посторінково",
+            description = "Параметри: ?page=0&size=5&sort=capacity,desc")
     @GetMapping("/shelters")
-    public List<ShelterView> list(@RequestParam(required = false) Integer districtId) {
-        return districtId == null ? service.findAll() : service.findByDistrict(districtId);
+    public PageResponse<ShelterView> list(@ParameterObject @PageableDefault(size = 20, sort = "name") Pageable pageable) {
+        return PageResponse.of(service.findPage(pageable));
+    }
+
+    @Operation(summary = "Укриття району")
+    @GetMapping("/districts/{districtId}/shelters")
+    public List<ShelterView> byDistrict(@PathVariable int districtId) {
+        return service.findByDistrict(districtId);
     }
 
     @Operation(summary = "Укриття з простроченою перевіркою")
@@ -87,14 +98,15 @@ public class ShelterApiController {
 
     @Operation(summary = "Перевірки укриття")
     @GetMapping("/shelters/{id}/inspections")
-    public List<Inspection> inspections(@PathVariable int id) {
+    public List<InspectionView> inspections(@PathVariable int id) {
         return service.findInspections(id);
     }
 
     @Operation(summary = "Зареєструвати перевірку", description = "Стан укриття змінюється за результатом перевірки")
     @PostMapping("/shelters/{id}/inspections")
-    public ShelterView inspect(@PathVariable int id, @Valid @RequestBody InspectionRequest request) {
-        return service.registerInspection(id, request.inspectorId(), request.result(), request.notes());
+    public ShelterView inspect(@PathVariable int id, @Valid @RequestBody InspectionRequest request,
+                               Principal principal) {
+        return service.registerInspection(id, principal.getName(), request.result(), request.notes());
     }
 
     @Operation(summary = "Райони міста")
